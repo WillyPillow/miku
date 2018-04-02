@@ -27,10 +27,18 @@ int testsuite(submission &sub)
 {
    system("rm -f ./testzone/*");
    const int testBoxid = BOXOFFSET + 0, spBoxid = BOXOFFSET + 1;
+   auto DelSandboxes = [&](){
+      sandboxDele(testBoxid);
+      sandboxDele(spBoxid);
+   };
+
    sandboxInit(testBoxid);
    sandboxInit(spBoxid);
    int status = compile(sub, testBoxid, spBoxid);
-   if(status != OK) return status;
+   if(status != OK) {
+      DelSandboxes();
+      return status;
+   }
 
    //anyway, only have batch judge right now
    map<pid_t, int> proc;
@@ -45,6 +53,7 @@ int testsuite(submission &sub)
          pid_t cid = waitpid(-1, &status, 0);
          if(cid == -1){
             perror("[ERROR] in testsuite,  `waitpid()` failed :");
+            DelSandboxes();
             return ER;
          }
          int td = proc[cid];
@@ -72,6 +81,7 @@ int testsuite(submission &sub)
          pid_t pid = fork();
          if(pid == -1){
             perror("[ERROR] in testsuite, `fork()` failed :");
+            DelSandboxes();
             return ER;
          }
          if(pid == 0){
@@ -89,6 +99,7 @@ int testsuite(submission &sub)
       pid_t cid = waitpid(-1, &status, 0);
       if(cid == -1){
          perror("[ERROR] in testsuite,  `waitpid()` failed :");
+         DelSandboxes();
          return ER;
       }
       const int td = proc[cid];
@@ -102,8 +113,7 @@ int testsuite(submission &sub)
       --procnum;
    }
    //clear box-10
-   sandboxDele(testBoxid);
-   sandboxDele(spBoxid);
+   DelSandboxes();
    return OK;
 }
 
