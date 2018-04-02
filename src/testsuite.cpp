@@ -3,8 +3,9 @@
 #include<sstream>
 #include<fstream>
 #include<iomanip>
-#include<unistd.h>
 #include<map>
+#include<unistd.h>
+#include<sys/stat.h>
 #include<sys/types.h>
 #include<sys/wait.h>
 #include"utils.h"
@@ -203,6 +204,14 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
    //user output
    sout.str("");
    sout << "/tmp/box/" << boxid << "/box/output";
+   { // check if output is regular file
+      struct stat output_stat;
+      if (stat(sout.str().c_str(), &output_stat) < 0 || !S_ISREG(output_stat.st_mode)) {
+         sub.verdict[td] = WA;
+         return;
+      }
+   }
+
    fstream mout(sout.str());
    while(true){
       if(tsol.eof() != mout.eof()){
