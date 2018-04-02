@@ -31,7 +31,7 @@ int testsuite(submission &sub)
    sandboxInit(spBoxid);
    int status = compile(sub, testBoxid, spBoxid);
    if(status != OK) return status;
-   
+
    //anyway, only have batch judge right now
    map<pid_t, int> proc;
    int procnum = 0;
@@ -157,7 +157,7 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
    if(sub.verdict[td] != OK){
       return ;
    }
-   
+
    if(sub.problem_type == 1){
       ostringstream sout;
       sout << "/tmp/box/" << spBoxid << "/box/sj.out ";
@@ -233,7 +233,7 @@ int compile(const submission& target, int boxid, int spBoxid)
    ostringstream sout;
    sout << "/tmp/box/" << boxid << "/box/";
    string boxdir(sout.str());
-   
+
    ofstream fout;
    if(target.lang == "c++"){
       fout.open(boxdir + "main.cpp");
@@ -244,7 +244,7 @@ int compile(const submission& target, int boxid, int spBoxid)
    }
    fout << target.code << flush;
    fout.close();
-   
+
    if(target.problem_type == 2){
       sout.str("");
       sout << boxdir << "lib" << setw(4) << setfill('0') << target.problem_id << ".h";
@@ -272,8 +272,9 @@ int compile(const submission& target, int boxid, int spBoxid)
    opt.preserve_env = true;
    opt.errout = "compile_error";
    opt.output = "/dev/null";
-   opt.timeout = 60 * 1000;
+   opt.timeout = 30 * 1000;
    opt.meta = "./testzone/metacomp";
+   opt.fsize_limit = 10 * 1024;
 
    sandboxExec(boxid, opt, comm);
    if(access((boxdir+"main.out").c_str(), F_OK) == -1){
@@ -292,19 +293,19 @@ int compile(const submission& target, int boxid, int spBoxid)
 
       return CE;
    }
-   
+
    if(target.problem_type == 1){
       sout.str("");
       sout << "/tmp/box/" << spBoxid << "/box/";
       string spBoxdir = sout.str();
-      
+
       fout.open(spBoxdir + "sj.cpp");
       fout << target.sjcode << flush;
       fout.close();
-      
+
       sout.str("");
-      sout << "/usr/bin/g++ ./sj.cpp -o ./sj.out -O2 -std=c++11 ";
-      
+      sout << "/usr/bin/env g++ ./sj.cpp -o ./sj.out -O2 -std=c++11 ";
+
       opt.meta = "./testzone/metacompsj";
 
       sandboxExec(spBoxid, opt, sout.str());
@@ -312,6 +313,6 @@ int compile(const submission& target, int boxid, int spBoxid)
          return ER;
       }
    }
-   
+
    return OK;
 }

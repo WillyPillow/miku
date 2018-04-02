@@ -2,8 +2,7 @@
 
 export PATH="app:bin:$PATH"
 
-for pid in {1001..1005}
-do
+for (( pid=$1; pid<=$2; pid++ )); do
   echo "start get PID $pid"
   ./bin/tddump $pid
 done
