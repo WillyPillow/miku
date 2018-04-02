@@ -33,14 +33,32 @@ int fetchSubmission(submission &sub)
    if(string(buff) == "c++11"){
       sub.lang = "c++";
       sub.std = "c++11";
+   }else if(string(buff) == "c++14"){
+      sub.lang = "c++";
+      sub.std = "c++14";
+   }else if(string(buff) == "c++17"){
+      sub.lang = "c++";
+      sub.std = "c++17";
+   }else if(string(buff) == "c++98"){
+      sub.lang = "c++";
+      sub.std = "c++98";
+   }else if(string(buff) == "c90"){
+      sub.lang = "c";
+      sub.std = "c90";
+   }else if(string(buff) == "c99"){
+      sub.lang = "c";
+      sub.std = "c99";
+   }else if(string(buff) == "c11"){
+      sub.lang = "c";
+      sub.std = "c11";
+   }else if(string(buff) == "haskell"){
+      sub.lang = "haskell";
+      sub.std = "";
    }else if(string(buff) == "c++"){
       sub.lang = "c++";
       sub.std = "";
    }else if(string(buff) == "c"){
       sub.lang = "c";
-      sub.std = "";
-   }else if(string(buff) == "haskell"){
-      sub.lang = "haskell";
       sub.std = "";
    }else{
       sub.lang = "c++";

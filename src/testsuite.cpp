@@ -267,11 +267,15 @@ int compile(const submission& target, int boxid, int spBoxid)
    if(target.lang == "c++"){
       sout << "/usr/bin/env g++ ./main.cpp -o ./main.out -O2 -w ";
    }else if(target.lang == "c"){
-      sout << "/usr/bin/env gcc ./main.c -o ./main.out -O2 -ansi -lm -w ";
+      if(target.std == "" || target.std == "c90"){
+         sout << "/usr/bin/env gcc ./main.c -o ./main.out -O2 -ansi -lm -w ";
+      }else{
+         sout << "/usr/bin/env gcc ./main.c -o ./main.out -O2 -lm -w ";
+      }
    }else{
       sout << "/usr/bin/env ghc ./main.hs -o ./main.out -O -tmpdir . -w ";
    }
-   if(!target.std.empty()){
+   if(!target.std.empty() && target.std != "c90"){
       sout << "-std=" << target.std << " ";
    }
    string comm(sout.str());
