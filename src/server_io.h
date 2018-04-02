@@ -12,6 +12,8 @@ int fetchProblem(submission &);
 
 int sendResult(submission &, int verdict, bool done);
 
+int sendMessage(const submission &, string);
+
 int respondValidating(int);
 
 #endif

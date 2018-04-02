@@ -178,3 +178,12 @@ int sendResult(submission &sub, int verdict, bool done)
    return 0;
 }
 
+int sendMessage(const submission &sub, string message)
+{
+   ostringstream sout;
+   sout << "update_message.py " << sub.submission_id;
+   FILE* Pipe = popen(sout.str().c_str(), "w");
+   fprintf(Pipe, "%s", message.c_str());
+   pclose(Pipe);
+   return 0;
+}
