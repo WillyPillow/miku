@@ -278,11 +278,11 @@ int compile(const submission& target, int boxid, int spBoxid)
    sandboxExec(boxid, opt, comm);
    if(access((boxdir+"main.out").c_str(), F_OK) == -1){
       if(access((boxdir+"compile_error").c_str(), F_OK) == 0){
-          ifstream compile_error_msg((boxdir+"compile_error").c_str());
-          stringstream cerr_msg_buff;
-          cerr_msg_buff << compile_error_msg.rdbuf();
-          string cerr_msg = cerr_msg_buff.str();
           const int MAX_MSG_LENGTH = 3000;
+          ifstream compile_error_msg((boxdir+"compile_error").c_str());
+          char cerr_msg_cstring[MAX_MSG_LENGTH + 5] = "";
+          compile_error_msg.read(cerr_msg_cstring, MAX_MSG_LENGTH + 1);
+          string cerr_msg(cerr_msg_cstring);
           if(cerr_msg.size() > MAX_MSG_LENGTH){
               cerr_msg = cerr_msg.substr(0,MAX_MSG_LENGTH) + "\n(Error message truncated after " + to_string(MAX_MSG_LENGTH) + " Bytes.)";
           }
