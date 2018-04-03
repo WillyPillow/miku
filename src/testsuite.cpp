@@ -3,6 +3,7 @@
 #include<sstream>
 #include<fstream>
 #include<iomanip>
+#include<regex>
 #include<map>
 #include<unistd.h>
 #include<sys/stat.h>
@@ -308,7 +309,14 @@ int compile(const submission& target, int boxid, int spBoxid)
           compile_error_msg.read(cerr_msg_cstring, MAX_MSG_LENGTH + 1);
           string cerr_msg(cerr_msg_cstring);
           if(cerr_msg.size() > MAX_MSG_LENGTH){
-              cerr_msg = cerr_msg.substr(0,MAX_MSG_LENGTH) + "\n(Error message truncated after " + to_string(MAX_MSG_LENGTH) + " Bytes.)";
+             cerr_msg = regex_replace(cerr_msg.substr(0, MAX_MSG_LENGTH),
+                   regex("(^|\\n)In file included from[\\S\\s]*?((\\n\\./main\\.c)|($))"),
+                   "$1[Error messages from headers removed]$2");
+             cerr_msg += "\n(Error message truncated after " + to_string(MAX_MSG_LENGTH) + " Bytes.)";
+          } else {
+             cerr_msg = regex_replace(cerr_msg,
+                   regex("(^|\\n)In file included from[\\S\\s]*?((\\n\\./main\\.c)|($))"),
+                   "$1[Error messages from headers removed]$2");
           }
           sendMessage(target, cerr_msg);
 
