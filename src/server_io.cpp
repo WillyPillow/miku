@@ -119,7 +119,7 @@ int fetchProblem(submission &sub)
       sout << buff;
    sub.code = sout.str();
    pclose(Pipe);
-   
+
    //get sjcode
    sout.str("");
    sout << "fetch_sjcode.py " << sub.problem_id;
@@ -129,7 +129,7 @@ int fetchProblem(submission &sub)
       sout << buff;
    sub.sjcode = sout.str();
    pclose(Pipe);
-   
+
    //get interlib
    sout.str("");
    sout << "fetch_interlib.py " << sub.problem_id;
@@ -139,7 +139,7 @@ int fetchProblem(submission &sub)
       sout << buff;
    sub.interlib = sout.str();
    pclose(Pipe);
-   
+
    delete [] buff;
    //check if testdata dir exists
    sout.str("");
@@ -154,7 +154,7 @@ int fetchProblem(submission &sub)
    if(downloadTestdata(sub) == -1){
       return -1;
    }
-   
+
    //get memlimit, timelimit
    sout.str("");
    sout << "fetch_limits.py " << sub.problem_id;
@@ -163,7 +163,7 @@ int fetchProblem(submission &sub)
       fscanf(Pipe, "%d %d", &sub.time_limit[i], &sub.mem_limit[i]);
    }
    pclose(Pipe);
-   
+
    return 0;
 }
 
@@ -180,11 +180,8 @@ int sendResult(submission &sub, int verdict, bool done)
          sout << fromVerdict(sub.verdict[i]).toAbr() << '/';
          sout << sub.time[i] << '/';
          sout << sub.mem[i] << '/';
-         
-         cerr << "td" << i << " : time " << sub.time[i];
-         cerr << " mem " << sub.mem[i];
-         cerr << " verdict " << fromVerdict(sub.verdict[i]).toStr();
-         cerr << endl;
+
+         Log("td", i, " : time ", sub.time[i], " mem ", sub.mem[i], " verdict ", fromVerdict(sub.verdict[i]).toStr());
       }
    }
    if(done){

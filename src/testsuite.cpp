@@ -127,7 +127,7 @@ void setExitStatus(submission &sub, int td)
    string line;
    map<string,string> META;
    while(!fin.eof() && getline(fin, line)){
-      for(int i = 0; i < line.size(); ++i)
+      for(size_t i = 0; i < line.size(); ++i)
          if(line[i] == ':')
             line[i] = ' ';
       istringstream in(line);
@@ -187,8 +187,8 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
       int result = 1;
       fscanf(Pipe, "%d", &result);
       pclose(Pipe);
-      cout << "[special judge] :" << (sjpath+ttout+tdin+tdout) << endl;
-      cout << "[special judge] td:" << td << " result:" << result << endl;
+      Log("[special judge] :", sjpath+ttout+tdin+tdout);
+      Log("[special judge] td:", td, " result:", result);
       if(result == 0)
          sub.verdict[td] = AC;
       else

@@ -7,6 +7,8 @@
 
 using namespace std;
 
+bool enable_log;
+
 int main(int argc, char *argv[])
 {
    if(argc < 5) return -1;
@@ -16,7 +18,7 @@ int main(int argc, char *argv[])
    for(int i = 1; i <= 5; ++i)
       stoi << argv[i] << ' ';
    stoi >> problem_id >> td >> boxid >> time_limit >> mem_limit;
-   
+
    //init box
    sandboxInit(boxid);
    ostringstream sout;
@@ -32,7 +34,7 @@ int main(int argc, char *argv[])
    system(("chmod 666 " + sout.str() + "input").c_str());
    system(("chmod 666 " + sout.str() + "output").c_str());
    system(("cp /tmp/box/" + testee + "/box/main.out" + sout.str() + "main.out").c_str());
-   
+
    //set options
    sandboxOptions opt;
    //opt.dirs.push_back("/tmp/box/10/box");
@@ -48,7 +50,7 @@ int main(int argc, char *argv[])
    opt.mem = mem_limit;
    opt.file_limit = 5;
    opt.fsize_limit = 65536;
-   
+
    //invoke box command
    sandboxExec(boxid, opt, "main.out");
 

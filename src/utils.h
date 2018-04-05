@@ -20,6 +20,21 @@ enum RESULTS{
 	ER
 };
 
+extern bool enable_log;
+
+template <class T> void LogNL(const T& str) {
+  if (enable_log) std::cerr << str;
+}
+
+template <class T, class... U> void LogNL(const T& str, U... tail) {
+  LogNL(str); LogNL(tail...);
+}
+
+template <class... T> void Log(T... param) {
+  LogNL(param...);
+  std::cerr << std::endl;
+}
+
 class fromVerdict{
 		const int verdict;
 	public:

@@ -14,6 +14,8 @@
 
 using namespace std;
 
+bool enable_log;
+
 void usage()
 {
    cout << "\
@@ -64,36 +66,33 @@ int main(int argc, char *argv[])
             usage();
       }
    }
-   
-   if(!verbose){
-      freopen("/dev/null", "w", stderr);
-   }
-   
+   enable_log = verbose;
+
    //initialize done
-   
+
    if(geteuid() != 0){
       cerr << "Must be started as root !" << endl;
       return 0;
    }
-   
+
    while(true){
       submission sub;
       int status = fetchSubmission(sub);
       if(status != 0){
          if(status == -2){
-            cerr << "[ERROR] Unable to connect to TIOJ url" << endl; 
+            Log("[ERROR] Unable to connect to TIOJ url");
          }
          usleep(1000000);
          continue;
       }
-      cerr << "Recieved submission [" << sub.submission_id << "]" << endl;
+      Log("Recieved submission [", sub.submission_id, "]");
       respondValidating(sub.submission_id);
       if(fetchProblem(sub) == -1){
          usleep(1000000);
-         cerr << "[ERROR] Unable to fetch problem meta" << endl;
+         Log("[ERROR] Unable to fetch problem meta");
          continue;
       }
-      
+
       int verdict = testsuite(sub);
       sendResult(sub, verdict, true);
    }

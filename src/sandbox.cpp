@@ -5,6 +5,7 @@
 #include<sstream>
 #include<iomanip>
 #include"sandbox.h"
+#include"utils.h"
 
 using namespace std;
 
@@ -14,7 +15,7 @@ int sandboxExec(int boxid, const sandboxOptions &opt, const string &comm)
    sout << "isolate --box-id=" << boxid;
    if(opt.cgroup) sout << " --cg";
    if(opt.preserve_env) sout << " --full-env";
-   for(int i = 0; i < opt.dirs.size(); ++i)
+   for(size_t i = 0; i < opt.dirs.size(); ++i)
       sout << " --dir=" << opt.dirs[i];
    if(!opt.input.empty()) sout << " --stdin=" << opt.input;
    if(!opt.output.empty()) sout << " --stdout=" << opt.output;
@@ -31,7 +32,7 @@ int sandboxExec(int boxid, const sandboxOptions &opt, const string &comm)
    sout << " --file-limit=" << opt.file_limit;
    sout << " --extra-time=0.2";
    sout << " --run -- " << comm;
-   cerr << "[debug] box-" << boxid << " execute command : " << sout.str() << endl;
+   Log("[debug] box-", boxid, " execute command : ", sout.str());
 
    system(sout.str().c_str());
    return 0;
@@ -43,7 +44,7 @@ int sandboxInit(int boxid)
    sout << "isolate --box-id=" << boxid;
    sout << " --cg";
    sout << " --init 2>/dev/null >/dev/null";
-   cerr << "[debug] box-" << boxid << " inited" << endl;
+   Log("[debug] box-", boxid, " inited");
    system(sout.str().c_str());
    return 0;
 }
@@ -54,7 +55,7 @@ int sandboxDele(int boxid)
    sout << "isolate --box-id=" << boxid;
    sout << " --cg";
    sout << " --cleanup 2>/dev/null >/dev/null";
-   cerr << "[debug] box-" << boxid << " cleaned" << endl;
+   Log("[debug] box-", boxid, " cleaned");
    system(sout.str().c_str());
    return 0;
 }
