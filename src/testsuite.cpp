@@ -290,8 +290,8 @@ int compile(const submission& target, int boxid, int spBoxid)
    }
    string comm(sout.str());
    sandboxOptions opt;
-   //opt.dirs.push_back("/etc");
-   //opt.dirs.push_back("/var");
+   //opt.dirs.push_back("/usr/lib");
+   if (target.lang == "haskell") opt.dirs.push_back("/var");
    opt.procs = 50;
    opt.preserve_env = true;
    opt.errout = "compile_error";
