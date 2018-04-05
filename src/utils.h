@@ -3,6 +3,10 @@
 
 #include<sstream>
 #include<string>
+#include<chrono>
+#include<ctime>
+#include<iomanip>
+#include<iostream>
 
 using namespace std;
 
@@ -27,12 +31,21 @@ template <class T> void LogNL(const T& str) {
 }
 
 template <class T, class... U> void LogNL(const T& str, U... tail) {
-  LogNL(str); LogNL(tail...);
+  if (enable_log) { LogNL(str); LogNL(tail...); }
 }
 
 template <class... T> void Log(T... param) {
-  LogNL(param...);
-  std::cerr << std::endl;
+  static char buf[100];
+  if (enable_log) {
+    using namespace std::chrono;
+    auto tnow = system_clock::now();
+    time_t now = system_clock::to_time_t(tnow);
+    int milli = duration_cast<milliseconds>(tnow - time_point_cast<seconds>(tnow)).count();
+    strftime(buf, 100, "%F %T ", localtime(&now));
+    std::cerr << buf << std::setfill('0') << std::setw(3) << milli << " -- ";
+    LogNL(param...);
+    std::cerr << std::endl;
+  }
 }
 
 class fromVerdict{
