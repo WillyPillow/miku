@@ -13,11 +13,15 @@ int main(int argc, char *argv[])
 {
    if(argc < 8) return -1;
    int problem_id, td, boxid, time_limit, mem_limit;
-   string testee(argv[6]), target(argv[7]);
+   string testee(argv[6]), lang(argv[7]);
    stringstream stoi;
    for(int i = 1; i <= 5; ++i)
       stoi << argv[i] << ' ';
    stoi >> problem_id >> td >> boxid >> time_limit >> mem_limit;
+
+   string target;
+   if(lang == "python2" || lang == "python3")target = "main.pyc";
+   else target = "main.out";
 
    //init box
    sandboxInit(boxid);
@@ -50,11 +54,12 @@ int main(int argc, char *argv[])
    opt.mem = mem_limit;
    opt.file_limit = 32;
    opt.fsize_limit = 65536;
-   if(target == "main.pyc")opt.env="HOME=/tmp/box/" + to_string(boxid) + "/box/";
+   if(lang == "python2" || lang == "python3")opt.env="HOME=/tmp/box/" + to_string(boxid) + "/box/";
 
    //invoke box command
-   if(target == "main.out")sandboxExec(boxid, opt, "main.out");
-   else if(target == "main.pyc")sandboxExec(boxid, opt, "/usr/bin/env python2 main.pyc");
+   if(lang == "python2")sandboxExec(boxid, opt, "/usr/bin/env python2 main.pyc");
+   else if(lang == "python3")sandboxExec(boxid, opt, "/usr/bin/env python3 main.pyc");
+   else sandboxExec(boxid, opt, "main.out");
 
    return 0;
 }
