@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
    if(lang == "python2" || lang == "python3")opt.env="HOME=/tmp/box/" + to_string(boxid) + "/box/";
 
    //invoke box command
-   if(lang == "python2")sandboxExec(boxid, opt, "/usr/bin/env python2 main.pyc");
-   else if(lang == "python3")sandboxExec(boxid, opt, "/usr/bin/env python3 main.pyc");
+   if(lang == "python2")sandboxExec(boxid, opt, "/usr/bin/env python2.7 main.pyc");
+   else if(lang == "python3")sandboxExec(boxid, opt, "/usr/bin/env python3.6 main.pyc");
    else sandboxExec(boxid, opt, "main.out");
 
    return 0;
