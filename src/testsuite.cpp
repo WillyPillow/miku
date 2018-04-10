@@ -80,6 +80,10 @@ int testsuite(submission &sub)
          else
            command << " " << mem_limit[i];
          command << " " << testBoxid;
+         if(sub.lang == "python2") 
+           command << " " << "main.pyc";
+         else
+           command << " " << "main.out";
          pid_t pid = fork();
          if(pid == -1){
             perror("[ERROR] in testsuite, `fork()` failed :");
@@ -259,8 +263,12 @@ int compile(const submission& target, int boxid, int spBoxid)
       fout.open(boxdir + "main.cpp");
    }else if(target.lang == "c"){
       fout.open(boxdir + "main.c");
-   }else{
+   }else if(target.lang == "haskell"){
       fout.open(boxdir + "main.hs");
+   }else if(target.lang == "python2"){
+      fout.open(boxdir + "main.py");
+   }else{
+      return CE;
    }
    fout << target.code << flush;
    fout.close();
@@ -282,8 +290,10 @@ int compile(const submission& target, int boxid, int spBoxid)
       }else{
          sout << "/usr/bin/env gcc ./main.c -o ./main.out -O2 -lm -w ";
       }
-   }else{
+   }else if(target.lang == "haskell"){
       sout << "/usr/bin/env ghc ./main.hs -o ./main.out -O -tmpdir . -w ";
+   }else if(target.lang == "python2"){
+      sout << "/usr/bin/env python2 -m py_compile main.py";
    }
    if(!target.std.empty() && target.std != "c90"){
       sout << "-std=" << target.std << " ";
@@ -301,7 +311,12 @@ int compile(const submission& target, int boxid, int spBoxid)
    opt.fsize_limit = 10 * 1024;
 
    sandboxExec(boxid, opt, comm);
-   if(access((boxdir+"main.out").c_str(), F_OK) == -1){
+   string compiled_target;
+   if(target.lang == "python2")
+     compiled_target = "main.pyc";
+   else
+     compiled_target = "main.out";
+   if(access((boxdir + compiled_target).c_str(), F_OK) == -1){
       if(access((boxdir+"compile_error").c_str(), F_OK) == 0){
           const int MAX_MSG_LENGTH = 3000;
           ifstream compile_error_msg((boxdir+"compile_error").c_str());

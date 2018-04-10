@@ -15,6 +15,7 @@ int sandboxExec(int boxid, const sandboxOptions &opt, const string &comm)
    sout << "isolate --box-id=" << boxid;
    if(opt.cgroup) sout << " --cg";
    if(opt.preserve_env) sout << " --full-env";
+   else if(!opt.env.empty()) sout<< " --env=" << opt.env;
    for(size_t i = 0; i < opt.dirs.size(); ++i)
       sout << " --dir=" << opt.dirs[i];
    if(!opt.input.empty()) sout << " --stdin=" << opt.input;

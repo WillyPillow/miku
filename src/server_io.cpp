@@ -54,6 +54,9 @@ int fetchSubmission(submission &sub)
    }else if(string(buff) == "haskell"){
       sub.lang = "haskell";
       sub.std = "";
+   }else if(string(buff) == "python2"){
+      sub.lang = "python2";
+      sub.std = "";
    }else if(string(buff) == "c++"){
       sub.lang = "c++";
       sub.std = "";
