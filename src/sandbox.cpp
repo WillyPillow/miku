@@ -14,10 +14,14 @@ int sandboxExec(int boxid, const sandboxOptions &opt, const string &comm)
    ostringstream sout;
    sout << "isolate --box-id=" << boxid;
    if(opt.cgroup) sout << " --cg";
-   if(opt.preserve_env) sout << " --full-env";
-   else if(!opt.env.empty()) sout<< " --env=" << opt.env;
-   for(size_t i = 0; i < opt.dirs.size(); ++i)
-      sout << " --dir=" << opt.dirs[i];
+   if(opt.preserve_env) {
+     sout << " --full-env";
+   } else {
+     for (const string& env : opt.envs)
+       sout<< " --env=" << env;
+   }
+   for(const string& dir : opt.dirs)
+      sout << " --dir=" << dir;
    if(!opt.input.empty()) sout << " --stdin=" << opt.input;
    if(!opt.output.empty()) sout << " --stdout=" << opt.output;
    if(!opt.errout.empty()) sout << " --stderr=" << opt.errout;
