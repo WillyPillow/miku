@@ -299,7 +299,7 @@ int compile(const submission& target, int boxid, int spBoxid)
    }
    string comm(sout.str());
    sandboxOptions opt;
-   //opt.dirs.push_back("/usr/lib");
+   opt.dirs.push_back("/etc/alternatives");
    if (target.lang == "haskell") opt.dirs.push_back("/var");
    opt.procs = 50;
    opt.preserve_env = true;
