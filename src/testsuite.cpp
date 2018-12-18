@@ -172,23 +172,26 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
    }
 
    if(sub.problem_type == 1){
-      ostringstream sout;
-      sout << "/tmp/box/" << spBoxid << "/box/sj.out ";
-      string sjpath(sout.str());
-      sout.str("");
-      sout << "./testdata/" << setfill('0') << setw(4) << problem_id << "/input" << setw(3) << td << ' ';
-      string tdin(sout.str());
-      sout.str("");
-      sout << "./testdata/" << setfill('0') << setw(4) << problem_id << "/output" << setw(3) << td << ' ';
-      string tdout(sout.str());
-      sout.str("");
-      sout << "/tmp/box/" << boxid << "/box/output ";
-      string ttout(sout.str());
-      FILE* Pipe = popen((sjpath+ttout+tdin+tdout).c_str(), "r");
+      string cmd;
+      {
+        ostringstream sout;
+        sout << "/tmp/box/" << spBoxid << "/box/sj.out ";
+        sout << "/tmp/box/" << boxid << "/box/output ";
+        sout << "./testdata/" << setfill('0') << setw(4) << problem_id << "/input" << setw(3) << td << ' ';
+        sout << "./testdata/" << setfill('0') << setw(4) << problem_id << "/output" << setw(3) << td << ' ';
+        sout << (sub.std.empty() ? sub.lang : sub.std) << ' ';
+        string codefile = "/tmp/box/" + to_string(boxid) + "/box/code";
+        sout << codefile;
+        cmd = sout.str();
+        ofstream fout(codefile);
+        fout.write(sub.code.c_str(), sub.code.size());
+      }
+
+      FILE* Pipe = popen(cmd.c_str(), "r");
       int result = 1;
       fscanf(Pipe, "%d", &result);
       pclose(Pipe);
-      Log("[special judge] :", sjpath+ttout+tdin+tdout);
+      Log("[special judge] :", cmd);
       Log("[special judge] td:", td, " result:", result);
       if(result == 0)
          sub.verdict[td] = AC;
@@ -267,7 +270,7 @@ int compile(const submission& target, int boxid, int spBoxid)
    }else{
       return CE;
    }
-   fout << target.code << flush;
+   fout.write(target.code.c_str(), target.code.size());
    fout.close();
 
    if(target.problem_type == 2){

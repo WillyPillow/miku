@@ -62,10 +62,10 @@ int fetchSubmission(submission &sub)
       sub.std = "";
    }else if(string(buff) == "c++"){
       sub.lang = "c++";
-      sub.std = "";
+      sub.std = "c++14";
    }else if(string(buff) == "c"){
       sub.lang = "c";
-      sub.std = "";
+      sub.std = "c11";
    }else{
       sub.lang = "c++";
       sub.std = "c++11";
