@@ -8,19 +8,14 @@
 #include<unistd.h>
 #include"server_io.h"
 
-int respondValidating(int submission_id)
-{
-   ostringstream sout;
-   sout << "respond_validating.py " << submission_id;
-   system(sout.str().c_str());
-   return 0;
+int respondValidating(int submission_id) {
+  return Execute("respond_validating.py", PadInt(submission_id));
 }
 
-int fetchSubmission(submission &sub)
-{
+int fetchSubmission(submission &sub) {
    FILE *Pipe = popen("fetch_submission.py", "r");
    fscanf(Pipe, "%d", &sub.submission_id);
-   if(sub.submission_id < 0){
+   if (sub.submission_id < 0) {
       pclose(Pipe);
       return sub.submission_id;
    }
@@ -73,8 +68,7 @@ int fetchSubmission(submission &sub)
    return 0;
 }
 
-int downloadTestdata(submission &sub)
-{
+int downloadTestdata(submission &sub) {
    ostringstream sout;
    sout << "./testdata/" << setfill('0') << setw(4) << sub.problem_id;
    sout << "/input";
@@ -104,7 +98,8 @@ int downloadTestdata(submission &sub)
          //need to renew td
          sout.str("");
          sout << testdata_id << ' ' << sub.problem_id << ' ' << i;
-         system(("fetch_testdata.py " + sout.str()).c_str());
+         Execute("fetch_testdata.py", PadInt(testdata_id),
+             PadInt(sub.problem_id), PadInt(i));
          ofstream fout(td + ".meta");
          fout << timestamp << endl;
       }
@@ -148,13 +143,8 @@ int fetchProblem(submission &sub)
 
    delete [] buff;
    //check if testdata dir exists
-   sout.str("");
-   sout << "./testdata/";
-   sout << setfill('0') << setw(4) << sub.problem_id;
-   string testdata_dir(sout.str());
-   if(access(testdata_dir.c_str(), F_OK)){
-      system(("mkdir " + testdata_dir + " 2>/dev/null").c_str());
-   }
+   string testdata_dir = TdPath(sub.problem_id);
+   if (access(testdata_dir.c_str(), F_OK)) Execute("mkdir", "-p", testdata_dir);
 
    //download testdata
    if(downloadTestdata(sub) == -1){
@@ -173,30 +163,23 @@ int fetchProblem(submission &sub)
    return 0;
 }
 
-int sendResult(submission &sub, int verdict, bool done)
-{
-   ostringstream sout;
-   sout << "update_verdict.py " << sub.submission_id << ' ';
-   if(verdict == CE){
-      sout << "CE";
-   }else if(verdict == ER){
-      sout << "ER";
-   }else{
-      for(int i = 0; i < sub.testdata_count; ++i){
-         sout << fromVerdict(sub.verdict[i]).toAbr() << '/';
-         sout << sub.time[i] << '/';
-         sout << sub.mem[i] << '/';
-
-         Log("td", i, " : time ", sub.time[i], " mem ", sub.mem[i], " verdict ", fromVerdict(sub.verdict[i]).toStr());
-      }
-   }
-   if(done){
-      sout << " OK OK";
-   }else{
-      sout << " NO NO";
-   }
-   system(sout.str().c_str());
-   return 0;
+int sendResult(submission &sub, int verdict, bool done) {
+  std::string result;
+  if (verdict == CE) {
+    result = "CE";
+  } else if(verdict == ER) {
+    result = "ER";
+  } else {
+    for (int i = 0; i < sub.testdata_count; ++i) {
+      result += fromVerdict(sub.verdict[i]).toAbr() + '/' +
+          PadInt(sub.time[i]) + '/' + PadInt(sub.mem[i]) + '/';
+      Log("td", i, " : time ", sub.time[i], " mem ", sub.mem[i], " verdict ",
+          fromVerdict(sub.verdict[i]).toStr());
+    }
+  }
+  std::string fin = done ? "OK" : "NO";
+  Execute("update_verdict.py", PadInt(sub.submission_id), result, fin, fin);
+  return 0;
 }
 
 int sendMessage(const submission &sub, string message)

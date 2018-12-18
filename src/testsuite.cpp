@@ -1,19 +1,19 @@
-#include<iostream>
-#include<cstdio>
-#include<sstream>
-#include<fstream>
-#include<iomanip>
-#include<regex>
-#include<map>
-#include<unistd.h>
-#include<sys/stat.h>
-#include<sys/types.h>
-#include<sys/wait.h>
-#include"utils.h"
-#include"sandbox.h"
-#include"config.h"
-#include"testsuite.h"
-#include"server_io.h"
+#include <iostream>
+#include <cstdio>
+#include <sstream>
+#include <fstream>
+#include <iomanip>
+#include <regex>
+#include <map>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include "utils.h"
+#include "sandbox.h"
+#include "config.h"
+#include "testsuite.h"
+#include "server_io.h"
 
 using namespace std;
 
@@ -25,9 +25,8 @@ int MAXPARNUM = 1;
 int BOXOFFSET = 10;
 bool AGGUPDATE = false;
 
-int testsuite(submission &sub)
-{
-   system("rm -f ./testzone/*");
+int testsuite(submission &sub) {
+   Execute("rm", "-f", "./testzone/*");
    const int testBoxid = BOXOFFSET + 0, spBoxid = BOXOFFSET + 1;
    auto DelSandboxes = [&](){
       sandboxDele(testBoxid);
@@ -70,17 +69,8 @@ int testsuite(submission &sub)
 
       if(procnum < MAXPARNUM){
          //batch judge
-         ostringstream command;
-         command << "batchjudge " << problem_id;
-         command << " " << i;
-         command << " " << BOXOFFSET + 10 + i;
-         command << " " << time_limit[i];
-         if(sub.lang == "haskell")
-           command << " " << mem_limit[i]*5 + 24*1024;
-         else
-           command << " " << mem_limit[i];
-         command << " " << testBoxid;
-         command << " " << sub.lang;
+         int memlim = sub.lang == "haskell" ?
+             mem_limit[i] * 5 + 24 * 1024 : mem_limit[i];
          pid_t pid = fork();
          if(pid == -1){
             perror("[ERROR] in testsuite, `fork()` failed :");
@@ -89,7 +79,14 @@ int testsuite(submission &sub)
          }
          if(pid == 0){
             //child proc
-            execl("/bin/sh", "sh", "-c", command.str().c_str(), NULL);
+            if (sub.lang == "haskell") mem_limit[i] = mem_limit[i] * 5 + 24 * 1024;
+            std::vector<std::string> cmd = {
+                "batchjudge", PadInt(problem_id), PadInt(i),
+                PadInt(BOXOFFSET + 10 + i), PadInt(time_limit[i]),
+                PadInt(memlim), PadInt(testBoxid), sub.lang, PadInt(enable_log)};
+#define LS(x) cmd[x].c_str()
+            execlp(LS(0),LS(0),LS(1),LS(2),LS(3),LS(4),LS(5),LS(6),LS(7),LS(8),nullptr);
+#undef LS
             perror("[ERROR] in testsuite, `execl()` failed :");
             exit(0);
          }

@@ -14,22 +14,16 @@ using namespace std;
 
 bool enable_log;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   if(argc < 2) return 0;
+  std::ios::sync_with_stdio(false);
+  std::cerr << std::nounitbuf;
   int pid = cast(argv[1]).to<int>();
   submission sub;
-
   sub.problem_id = pid;
 
-  ostringstream sout;
-  sout << "./testdata/";
-  sout << setfill('0') << setw(4) << sub.problem_id;
-  string testdata_dir(sout.str());
-  if(access(testdata_dir.c_str(), F_OK)){
-    system(("mkdir " + testdata_dir + " 2>/dev/null").c_str());
-  }
-
+  string testdata_dir = TdPath(sub.problem_id);
+  if (access(testdata_dir.c_str(), F_OK)) Execute("mkdir", "-p", testdata_dir);
   downloadTestdata(sub);
 
   return 0;

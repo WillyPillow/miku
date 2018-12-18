@@ -43,8 +43,9 @@ const struct option longopts[] = {
    {NULL,                  0,                   NULL,    0}
 };
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+   std::ios::sync_with_stdio(false);
+   std::cerr << std::nounitbuf;
    //initialize
    bool verbose = false;
    int ac;
