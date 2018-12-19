@@ -7,4 +7,5 @@ build/
 log/
 app/tioj_url.py
 app/tioj_url.pyc
+app/__pycache__
 /start_script.sh
