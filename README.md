@@ -10,11 +10,8 @@ $ git clone https://github.com/silverneko/miku.git
 $ make
 $ sudo ./start_script
 ```
-some configuration can be made inside startscript like:
--v(, or --verbose) for extra verbosity
--p(, or --parallel) [NUMBER] to have maxium [NUMBER] of parallel processes to evaluate usercode. However this may cause verbosity messages unreadable.
--b [NUMBER] to set sandbox indexing offset. Need to be set to an appropriate number if running multiple judges on one computer.
--a(, or --aggressive-update) add this to aggressivly update verdict and result.
-
-### Known issues
-sandbox doesn't set output limit: https://github.com/cms-dev/cms/issues/309
+Some configuration can be made inside startscript:
+- `-v/--verbose` for extra verbosity
+- `-p/--parallel [NUMBER]` to evaulate at most `[NUMBER]` testdata at the same time.
+- `-b [NUMBER]` to set sandbox indexing offset. Need to be set to an appropriate number if running multiple judges on one computer.
+- `-a/--aggressive-update` to aggressivly update verdict and result.
