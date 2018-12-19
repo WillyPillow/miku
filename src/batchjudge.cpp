@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
   opt.timeout = time_limit;
   opt.mem = mem_limit;
   opt.file_limit = 32;
-  opt.fsize_limit = 65536;
+  opt.fsize_limit = 524288;
   opt.envs.push_back(string("PATH=") + getenv("PATH"));
   if (lang == "python2" || lang == "python3") {
     opt.envs.push_back("HOME=/tmp/box/" + to_string(boxid) + "/box/");
