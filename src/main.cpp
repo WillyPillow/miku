@@ -73,7 +73,12 @@ int main(int argc, char *argv[]) {
 
    if(geteuid() != 0){
       cerr << "Must be started as root !" << endl;
-      return 0;
+      return 1;
+   }
+
+   if (!InitServerIO()) {
+      Log("Error starting server_io.py");
+      return 1;
    }
 
    while(true){

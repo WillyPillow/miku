@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -O2 -Wall -Wno-unused-result -std=c++11 -g
+CFLAGS = -O2 -Wall -Wno-unused-result -std=c++17 -g
 SRC = ./src
 HEADERS = ./src/config.h ./src/utils.h
 

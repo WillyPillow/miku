@@ -11,7 +11,7 @@ using namespace std;
 bool enable_log;
 
 int main(int argc, char *argv[]) {
-  if(argc < 9) return -1;
+  if (argc < 9) return -1;
   int problem_id, td, boxid, time_limit, mem_limit, testee;
   string lang;
   try {
@@ -43,10 +43,11 @@ int main(int argc, char *argv[]) {
   string boxinput = BoxInput(boxid);
   string boxoutput = BoxOutput(boxid);
   Execute("cp", tdinput, boxinput);
-  Execute("chmod", "755", boxpath);
-  Execute("touch", boxinput);
-  Execute("touch", boxoutput);
-  Execute("chmod", "666", boxinput, boxoutput);
+  chmod(boxpath.c_str(), 0755);
+  //Execute("touch", boxinput); // ??
+  //Execute("touch", boxoutput);
+  chmod(boxinput.c_str(), 0666);
+  chmod(boxoutput.c_str(), 0666);
   Execute("cp", BoxPath(testee) + target, boxpath + target);
 
   //set options

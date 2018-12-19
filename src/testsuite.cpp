@@ -45,10 +45,9 @@ int testsuite(submission &sub) {
    map<pid_t, int> proc;
    int procnum = 0;
    int problem_id = sub.problem_id;
-   int* time_limit = sub.time_limit;
-   int* mem_limit = sub.mem_limit;
 
-   for(int i = 0; i < sub.testdata_count; ++i){
+   for (size_t i = 0; i < sub.tds.size(); ++i) {
+      auto& nowtd = sub.tds[i];
       while(procnum >= MAXPARNUM){
          int status;
          pid_t cid = waitpid(-1, &status, 0);
@@ -69,8 +68,8 @@ int testsuite(submission &sub) {
 
       if(procnum < MAXPARNUM){
          //batch judge
-         int memlim = sub.lang == "haskell" ?
-             mem_limit[i] * 5 + 24 * 1024 : mem_limit[i];
+         int memlim = nowtd.mem_limit;
+         if (sub.lang == "haskell") memlim = memlim * 5 + 24 * 1024;
          pid_t pid = fork();
          if(pid == -1){
             perror("[ERROR] in testsuite, `fork()` failed :");
@@ -79,10 +78,9 @@ int testsuite(submission &sub) {
          }
          if(pid == 0){
             //child proc
-            if (sub.lang == "haskell") mem_limit[i] = mem_limit[i] * 5 + 24 * 1024;
             std::vector<std::string> cmd = {
                 "batchjudge", PadInt(problem_id), PadInt(i),
-                PadInt(BOXOFFSET + 10 + i), PadInt(time_limit[i]),
+                PadInt(BOXOFFSET + 10 + i), PadInt(nowtd.time_limit),
                 PadInt(memlim), PadInt(testBoxid), sub.lang, PadInt(enable_log)};
 #define LS(x) cmd[x].c_str()
             execlp(LS(0),LS(0),LS(1),LS(2),LS(3),LS(4),LS(5),LS(6),LS(7),LS(8),nullptr);
@@ -134,37 +132,37 @@ void setExitStatus(submission &sub, int td)
       META[a] = b;
    }
 
-   //mem_used
-   sub.mem[td] = cast(META["max-rss"]).to<int>();
-   //time_used
-   sub.time[td] = 1000 * cast(META["time"]).to<double>();
-   //verdict
+   auto& nowtd = sub.tds[td];
+   // mem_used
+   nowtd.mem = cast(META["max-rss"]).to<int>();
+   // time_used
+   nowtd.time = 1000 * cast(META["time"]).to<double>();
+   // verdict
    if(META["status"] == ""){
-      sub.verdict[td] = OK;
+      nowtd.verdict = OK;
    }else if(META["status"] == "TO"){
-      sub.verdict[td] = TLE;
+      nowtd.verdict = TLE;
    }else if(META["status"] == "SG"){
       switch(cast(META["exitsig"]).to<int>()){
          case 11:
-            sub.verdict[td] = MLE;
+            nowtd.verdict = MLE;
             break;
          default :
-            sub.verdict[td] = RE;
+            nowtd.verdict = RE;
       }
    }else if(META["status"] == "RE"){
-      sub.verdict[td] = RE;
+      nowtd.verdict = RE;
    }else{
-      // "XX"
-      sub.verdict[td] = ER;
+      nowtd.verdict = ER;
    }
-   return ;
 }
 
 void eval(submission &sub, int td, int boxid, int spBoxid)
 {
+   auto& nowtd = sub.tds[td];
    int problem_id = sub.problem_id;
    setExitStatus(sub, td);
-   if(sub.verdict[td] != OK){
+   if(nowtd.verdict != OK){
       return ;
    }
 
@@ -190,11 +188,8 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
       pclose(Pipe);
       Log("[special judge] :", cmd);
       Log("[special judge] td:", td, " result:", result);
-      if(result == 0)
-         sub.verdict[td] = AC;
-      else
-         sub.verdict[td] = WA;
-      return ;
+      nowtd.verdict = result ? WA : AC;
+      return;
    }
 
    int status = AC;
@@ -209,7 +204,7 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
    { // check if output is regular file
       struct stat output_stat;
       if (stat(sout.str().c_str(), &output_stat) < 0 || !S_ISREG(output_stat.st_mode)) {
-         sub.verdict[td] = WA;
+         nowtd.verdict = WA;
          return;
       }
    }
@@ -245,8 +240,7 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
          break;
       }
    }
-   sub.verdict[td] = status;
-   return ;
+   nowtd.verdict = status;
 }
 
 int compile(const submission& target, int boxid, int spBoxid)
@@ -333,9 +327,7 @@ int compile(const submission& target, int boxid, int spBoxid)
                    "$1[Error messages from headers removed]$2");
           }
           sendMessage(target, cerr_msg);
-
       }
-
       return CE;
    }
 

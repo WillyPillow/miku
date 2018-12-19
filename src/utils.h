@@ -14,8 +14,6 @@
 #include <iostream>
 #include <type_traits>
 
-using namespace std;
-
 enum RESULTS {
   OK = 0,
   AC = 10,
@@ -159,6 +157,7 @@ std::string BoxPath(int box);
 std::string BoxInput(int box);
 std::string BoxOutput(int box);
 std::string TdPath(int prob);
+std::string TdMeta(int prob, int td);
 std::string TdInput(int prob, int td);
 std::string TdOutput(int prob, int td);
 
@@ -221,60 +220,42 @@ class fromVerdict{
   }
 };
 
-class cast{
-  const string val;
+class cast {
+  const std::string val;
  public:
   explicit cast();
-  cast(const string& c) : val(c) {}
-  template<typename T> T to() const {
+  cast(const std::string& c) : val(c) {}
+  template <typename T> T to() const {
     T res;
-    istringstream in(val);
+    std::istringstream in(val);
     in >> res;
     return res;
   }
 };
 
-class submission{
+class submission {
  public:
   //meta
   int problem_id;
   int submission_id;
-  string code;
-  string sjcode;
-  string interlib;
-  string lang;
-  string std;
-  string submitter;
+  std::string code;
+  std::string sjcode;
+  std::string interlib;
+  std::string lang;
+  std::string std;
+  std::string submitter;
   int submitter_id;
   //problem
   int problem_type;
-  string special_judge;
+  std::string special_judge;
   //test result
-  int testdata_count;
-  int mem_limit[200];
-  int time_limit[200];
-  int verdict[200];
-  int mem[200], time[200];
-  
-  submission() {
-    problem_id = 0;
-    submission_id = 0;
-    code = "";
-    sjcode = "";
-    interlib = "";
-    lang = "";
-    std = "";
-    submitter = "";
-    submitter_id = 0;
-    problem_type = 0;
-    special_judge = "";
-    testdata_count = 0;
-    fill(mem_limit, mem_limit + 200, 0);
-    fill(time_limit, time_limit + 200, 0);
-    fill(verdict, verdict + 200, 0);
-    fill(mem, mem + 200, 0);
-    fill(time, time + 200, 0);
-  }
+  struct Testdata {
+    int mem_limit, time_limit, verdict, mem, time;
+  };
+  std::vector<Testdata> tds;
+
+  submission() : problem_id(0), submission_id(0), submitter_id(0),
+      problem_type(0) {}
 };
 
 #endif

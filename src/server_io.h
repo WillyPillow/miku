@@ -4,16 +4,18 @@
 #include"utils.h"
 #include"config.h"
 
-int fetchSubmission(submission &);
+bool InitServerIO();
 
-int downloadTestdata(submission &);
+int fetchSubmission(submission&);
 
-int fetchProblem(submission &);
+int downloadTestdata(submission&);
 
-int sendResult(submission &, int verdict, bool done);
+int fetchProblem(submission&);
 
-int sendMessage(const submission &, string);
+int sendResult(submission&, int verdict, bool done);
 
-int respondValidating(int);
+int sendMessage(const submission&, const std::string&);
+
+void respondValidating(int submission_id);
 
 #endif
