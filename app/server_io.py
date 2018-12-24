@@ -27,9 +27,9 @@ def Read():
     query_id = int.from_bytes(header[2:4], byteorder = 'little')
     size = int.from_bytes(header[4:8], byteorder = 'little')
     if query_type == 8:
-        msg = stdin.read(size).split(b' ', 1)
+        msg = stdin.read(size).split(b'\0', 1)
         return (query_type, no_rep, query_id, [msg[0].decode('utf-8'), msg[1]])
-    return (query_type, no_rep, query_id, stdin.read(size).decode('utf-8').split())
+    return (query_type, no_rep, query_id, [i.decode('utf-8') for i in stdin.read(size).split(b'\0')])
 def Write(query_id, msg, status = 0):
     stdout.write(query_id.to_bytes(2, byteorder = 'little') + \
             bytes([status, 0]) + len(msg).to_bytes(4, byteorder = 'little') + msg)
@@ -81,11 +81,12 @@ mapping = {
 }
 
 # Alive check
-if Read() == (255, 0, 0, []): Write(0, b'')
+if Read() == (255, 0, 0, ['']): Write(0, b'')
 else: ErrExit('Alive check failed')
 
 while True:
     query_type, no_rep, query_id, msg = Read()
+    if msg == ['']: msg = []
     if query_type not in mapping:
         if not no_rep: Write(query_id, b'', 255)
         continue

@@ -170,8 +170,8 @@ int downloadTestdata(submission &sub) {
     if (flag) {
       // renew td
       Log("Renew testdata:", testdata_id, sub.problem_id, i);
-      if (SendCmd(kFetchTestdata, PadInt(testdata_id) + ' ' +
-          PadInt(sub.problem_id) + ' ' + PadInt(i)).status) return -1;
+      if (SendCmd(kFetchTestdata, PadInt(testdata_id) + '\0' +
+          PadInt(sub.problem_id) + '\0' + PadInt(i)).status) return -1;
       std::ofstream fout(metafile);
       fout << timestamp << '\n';
     }
@@ -220,12 +220,12 @@ int sendResult(submission &sub, int verdict, bool done) {
           fromVerdict(nowtd.verdict).toStr());
     }
   }
-  SendMsg(kUpdateVerdict, PadInt(sub.submission_id) + ' ' +
-      result + ' ' + (done ? "OK" : "NO"), true);
+  SendMsg(kUpdateVerdict, PadInt(sub.submission_id) + '\0' +
+      result + '\0' + (done ? "OK" : "NO"), true);
   return 0;
 }
 
 int sendMessage(const submission &sub, const std::string& message) {
-  SendMsg(kUpdateMessage, PadInt(sub.submission_id) + ' ' + message, true);
+  SendMsg(kUpdateMessage, PadInt(sub.submission_id) + '\0' + message, true);
   return 0;
 }
