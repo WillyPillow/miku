@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int sandboxExec(int boxid, const sandboxOptions &opt, const string &comm) {
+int sandboxExec(int boxid, const sandboxOptions &opt, const std::vector<string>& comm) {
   std::vector<std::string> args{"isolate", "--box-id=" + PadInt(boxid)};
   if (opt.cgroup) args.emplace_back("--cg");
   if (opt.preserve_env) {
@@ -38,21 +38,7 @@ int sandboxExec(int boxid, const sandboxOptions &opt, const string &comm) {
   args.emplace_back("--extra-time=0.2");
   args.emplace_back("--run");
   args.emplace_back("--");
-  {
-    size_t pos = 0;
-    while (true) {
-      size_t nxt = comm.find(' ', pos);
-      if (nxt == string::npos) {
-        args.emplace_back(comm.substr(pos));
-        break;
-      } else {
-        args.emplace_back(comm.substr(pos, nxt - pos));
-        pos = nxt + 1;
-        while (pos != comm.size() && comm[pos] == ' ') pos++;
-        if (pos == comm.size()) break;
-      }
-    }
-  }
+  for (const std::string& str : comm) args.emplace_back(str);
   Log("[debug] box-", boxid, "start exec");
   Execute(args);
   return 0;

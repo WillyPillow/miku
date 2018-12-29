@@ -26,7 +26,7 @@ class sandboxOptions{
 
 int sandboxInit(int boxid);
 
-int sandboxExec(int boxid, const sandboxOptions &, const string &);
+int sandboxExec(int boxid, const sandboxOptions &, const std::vector<string>&);
 
 int sandboxDele(int boxid);
 

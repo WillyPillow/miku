@@ -245,9 +245,7 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
 
 int compile(const submission& target, int boxid, int spBoxid)
 {
-   ostringstream sout;
-   sout << "/tmp/box/" << boxid << "/box/";
-   string boxdir(sout.str());
+   string boxdir = BoxPath(boxid);
 
    ofstream fout;
    if(target.lang == "c++"){
@@ -265,33 +263,31 @@ int compile(const submission& target, int boxid, int spBoxid)
    fout.close();
 
    if(target.problem_type == 2){
-      sout.str("");
-      sout << boxdir << "lib" << setw(4) << setfill('0') << target.problem_id << ".h";
-      fout.open(sout.str());
-      fout << target.interlib << flush;
+      fout.open(boxdir + "lib" + PadInt(target.problem_id, 4)  + ".h");
+      fout << target.interlib;
       fout.close();
    }
 
-   sout.str("");
-   if(target.lang == "c++"){
-      sout << "/usr/bin/env g++ ./main.cpp -o ./main.out -O2 -w ";
-   }else if(target.lang == "c"){
-      if(target.std == "" || target.std == "c90"){
-         sout << "/usr/bin/env gcc ./main.c -o ./main.out -O2 -ansi -lm -w ";
-      }else{
-         sout << "/usr/bin/env gcc ./main.c -o ./main.out -O2 -lm -w ";
-      }
-   }else if(target.lang == "haskell"){
-      sout << "/usr/bin/env ghc ./main.hs -o ./main.out -O -tmpdir . -w ";
-   }else if(target.lang == "python2"){
-      sout << "/usr/bin/env python2.7 -m py_compile main.py";
-   }else if(target.lang == "python3"){
-      sout << "/usr/bin/env python3.6 -c \"import py_compile;py_compile.compile('main.py','main.pyc')\"";
-   }
-   if(!target.std.empty() && target.std != "c90"){
-      sout << "-std=" << target.std << " ";
-   }
-   string comm(sout.str());
+  std::vector<std::string> args;
+  if(target.lang == "c++"){
+    args = {"/usr/bin/env", "g++", "./main.cpp", "-o", "./main.out", "-O2", "-w"};
+  }else if(target.lang == "c"){
+    if(target.std == "" || target.std == "c90"){
+      args = {"/usr/bin/env", "gcc", "./main.c", "-o", "./main.out", "-O2", "-ansi", "-lm", "-w"};
+    }else{
+      args = {"/usr/bin/env", "gcc", "./main.c", "-o", "./main.out", "-O2", "-lm", "-w"};
+    }
+  }else if(target.lang == "haskell"){
+    args = {"/usr/bin/env", "ghc", "./main.hs", "-o", "./main.out", "-O", "-tmpdir", ".", "-w"};
+  }else if(target.lang == "python2"){
+    args = {"/usr/bin/env", "python2.7", "-m", "py_compile", "main.py"};
+  }else if(target.lang == "python3"){
+    args = {"/usr/bin/env", "python3.6", "-c", "import py_compile;py_compile.compile(\'main.py\',\'main.pyc\')"};
+  }
+  if(!target.std.empty() && target.std != "c90"){
+    args.push_back("-std=" + target.std);
+  }
+
    sandboxOptions opt;
    opt.dirs.push_back("/etc/alternatives");
    if (target.lang == "haskell") opt.dirs.push_back("/var");
@@ -303,7 +299,7 @@ int compile(const submission& target, int boxid, int spBoxid)
    opt.meta = "./testzone/metacomp";
    opt.fsize_limit = 10 * 1024;
 
-   sandboxExec(boxid, opt, comm);
+   sandboxExec(boxid, opt, args);
    string compiled_target;
    if(target.lang == "python2" || target.lang == "python3")
      compiled_target = "main.pyc";
@@ -332,20 +328,17 @@ int compile(const submission& target, int boxid, int spBoxid)
    }
 
    if(target.problem_type == 1){
-      sout.str("");
-      sout << "/tmp/box/" << spBoxid << "/box/";
-      string spBoxdir = sout.str();
+      string spBoxdir(BoxPath(spBoxid));
 
       fout.open(spBoxdir + "sj.cpp");
-      fout << target.sjcode << flush;
+      fout << target.sjcode;
       fout.close();
 
-      sout.str("");
-      sout << "/usr/bin/env g++ ./sj.cpp -o ./sj.out -O2 -std=c++11 ";
-
+      std::vector<std::string> args{"/usr/bin/env", "g++", "./sj.cpp", "-o",
+          "./sj.out", "-O2", "-std=c++14"};
       opt.meta = "./testzone/metacompsj";
 
-      sandboxExec(spBoxid, opt, sout.str());
+      sandboxExec(spBoxid, opt, args);
       if(access((spBoxdir+"sj.out").c_str(), F_OK) == -1){
          return ER;
       }
