@@ -117,9 +117,7 @@ int testsuite(submission &sub) {
 
 void setExitStatus(submission &sub, int td)
 {
-   ostringstream sout;
-   sout << "./testzone/META" << td;
-   ifstream fin(sout.str());
+   ifstream fin("./testzone/META" + PadInt(td));
    string line;
    map<string,string> META;
    while(!fin.eof() && getline(fin, line)){
@@ -169,15 +167,14 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
    if(sub.problem_type == 1){
       string cmd;
       {
-        ostringstream sout;
-        sout << "/tmp/box/" << spBoxid << "/box/sj.out ";
-        sout << "/tmp/box/" << boxid << "/box/output ";
-        sout << "./testdata/" << setfill('0') << setw(4) << problem_id << "/input" << setw(3) << td << ' ';
-        sout << "./testdata/" << setfill('0') << setw(4) << problem_id << "/output" << setw(3) << td << ' ';
-        sout << (sub.std.empty() ? sub.lang : sub.std) << ' ';
-        string codefile = "/tmp/box/" + to_string(boxid) + "/box/code";
-        sout << codefile;
-        cmd = sout.str();
+        cmd += BoxPath(spBoxid) + "sj.out ";
+        cmd += BoxPath(boxid) + "output ";
+        cmd += TdInput(problem_id, td) + ' ';
+        cmd += TdOutput(problem_id, td) + ' ';
+        cmd += (sub.std.empty() ? sub.lang : sub.std) + ' ';
+
+        string codefile = BoxPath(boxid) + "code";
+        cmd += codefile;
         ofstream fout(codefile);
         fout.write(sub.code.c_str(), sub.code.size());
       }
@@ -194,22 +191,18 @@ void eval(submission &sub, int td, int boxid, int spBoxid)
 
    int status = AC;
    //solution output
-   ostringstream sout;
-   sout << "./testdata/" << setfill('0') << setw(4) << problem_id
-      << "/output" << setw(3) << td;
-   fstream tsol(sout.str());
+   fstream tsol(TdOutput(problem_id, td));
    //user output
-   sout.str("");
-   sout << "/tmp/box/" << boxid << "/box/output";
+   std::string output_file = BoxPath(boxid) + "output";
    { // check if output is regular file
       struct stat output_stat;
-      if (stat(sout.str().c_str(), &output_stat) < 0 || !S_ISREG(output_stat.st_mode)) {
+      if (stat(output_file.c_str(), &output_stat) < 0 || !S_ISREG(output_stat.st_mode)) {
          nowtd.verdict = WA;
          return;
       }
    }
 
-   fstream mout(sout.str());
+   fstream mout(output_file);
    while(true){
       if(tsol.eof() != mout.eof()){
          while(tsol.eof() != mout.eof()){

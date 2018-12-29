@@ -52,7 +52,6 @@ int main(int argc, char *argv[]) {
 
   //set options
   sandboxOptions opt;
-  //opt.dirs.push_back("/tmp/box/10/box");
   opt.cgroup = true;
   opt.procs = 1;
   opt.input = "input";
@@ -65,7 +64,7 @@ int main(int argc, char *argv[]) {
   opt.fsize_limit = 524288;
   opt.envs.push_back(string("PATH=") + getenv("PATH"));
   if (lang == "python2" || lang == "python3") {
-    opt.envs.push_back("HOME=/tmp/box/" + to_string(boxid) + "/box/");
+    opt.envs.push_back("HOME=" + BoxPath(boxid));
   }
 
   //invoke box command
