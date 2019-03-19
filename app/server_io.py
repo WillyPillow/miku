@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from tioj_url import tioj_url, tioj_key
-from urllib.request import urlopen, urlretrieve, URLError
+from urllib.request import urlopen, urlretrieve, URLError, ContentTooShortError
 from urllib.parse import urlencode
 from datetime import datetime
 import sys, inspect, os
