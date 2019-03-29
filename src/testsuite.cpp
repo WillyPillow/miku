@@ -81,9 +81,10 @@ int testsuite(submission &sub) {
             std::vector<std::string> cmd = {
                 "batchjudge", PadInt(problem_id), PadInt(i),
                 PadInt(BOXOFFSET + 10 + i), PadInt(nowtd.time_limit),
-                PadInt(memlim), PadInt(testBoxid), sub.lang, PadInt(enable_log)};
+                PadInt(memlim), PadInt(nowtd.output_limit),
+                PadInt(testBoxid), sub.lang, PadInt(enable_log)};
 #define LS(x) cmd[x].c_str()
-            execlp(LS(0),LS(0),LS(1),LS(2),LS(3),LS(4),LS(5),LS(6),LS(7),LS(8),nullptr);
+            execlp(LS(0),LS(0),LS(1),LS(2),LS(3),LS(4),LS(5),LS(6),LS(7),LS(8),LS(9),nullptr);
 #undef LS
             perror("[ERROR] in testsuite, `execl()` failed :");
             exit(0);
@@ -290,7 +291,7 @@ int compile(const submission& target, int boxid, int spBoxid)
    opt.output = "/dev/null";
    opt.timeout = 30 * 1000;
    opt.meta = "./testzone/metacomp";
-   opt.fsize_limit = 10 * 1024;
+   opt.fsize_limit = 32768;
 
    sandboxExec(boxid, opt, args);
    string compiled_target;

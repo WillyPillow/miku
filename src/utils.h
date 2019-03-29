@@ -250,7 +250,7 @@ class submission {
   std::string special_judge;
   //test result
   struct Testdata {
-    int mem_limit, time_limit, verdict, mem, time;
+    int mem_limit, time_limit, output_limit, verdict, mem, time;
   };
   std::vector<Testdata> tds;
 

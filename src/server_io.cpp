@@ -201,7 +201,7 @@ int fetchProblem(submission &sub) {
   Reply rep = SendCmd(kFetchLimits, pid);
   if (rep.status) return -1;
   std::stringstream ss(rep.message);
-  for (auto& i : sub.tds) ss >> i.time_limit >> i.mem_limit;
+  for (auto& i : sub.tds) ss >> i.time_limit >> i.mem_limit >> i.output_limit;
   return 0;
 }
 
