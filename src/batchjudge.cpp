@@ -68,18 +68,17 @@ int main(int argc, char *argv[]) {
   opt.mem = mem_limit;
   opt.fsize_limit = output_limit;
   opt.envs.push_back(string("PATH=") + getenv("PATH"));
+  opt.file_limit = 48;
   if (lang == "python2" || lang == "python3") {
-    opt.file_limit = 16;
     opt.envs.push_back("HOME=" + BoxPath(boxid));
-  } else {
-    opt.file_limit = 10;
+    opt.envs.push_back("PYTHONIOENCODING=utf-8");
   }
 
   //invoke box command
   if (lang == "python2") {
     sandboxExec(boxid, opt, {"/usr/bin/env", "python2.7", "main.pyc"});
   } else if (lang == "python3") {
-    sandboxExec(boxid, opt, {"/usr/bin/env", "python3.6", "main.pyc"});
+    sandboxExec(boxid, opt, {"/usr/bin/env", "python3.7", "main.pyc"});
   } else {
     sandboxExec(boxid, opt, {"main.out"});
   }
