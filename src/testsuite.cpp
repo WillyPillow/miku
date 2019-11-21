@@ -14,6 +14,7 @@
 #include "config.h"
 #include "testsuite.h"
 #include "server_io.h"
+#include "batchjudge.h"
 
 using namespace std;
 
@@ -78,16 +79,9 @@ int testsuite(submission &sub) {
          }
          if(pid == 0){
             //child proc
-            std::vector<std::string> cmd = {
-                "batchjudge", PadInt(problem_id), PadInt(i),
-                PadInt(BOXOFFSET + 10 + i), PadInt(nowtd.time_limit),
-                PadInt(memlim), PadInt(nowtd.output_limit),
-                PadInt(testBoxid), sub.lang, PadInt(enable_log)};
-#define LS(x) cmd[x].c_str()
-            execlp(LS(0),LS(0),LS(1),LS(2),LS(3),LS(4),LS(5),LS(6),LS(7),LS(8),LS(9),nullptr);
-#undef LS
-            perror("[ERROR] in testsuite, `execl()` failed :");
-            exit(0);
+            int status = BatchJudge(problem_id, i, BOXOFFSET + 10 + i, nowtd.time_limit,
+                memlim, nowtd.output_limit, testBoxid, sub.lang);
+            exit(status);
          }
          proc[pid] = i;
          ++procnum;

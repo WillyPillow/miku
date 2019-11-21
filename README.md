@@ -2,7 +2,9 @@ miku
 ==
 
 ```bash
-$ git clone https://github.com/silverneko/miku.git
+$ git clone https://github.com/adrien1018/miku.git
+$ cd miku
+$ git submodule update --init
 ```
 
 #### How to start the judge client

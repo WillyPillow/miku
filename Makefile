@@ -3,9 +3,9 @@ CFLAGS = -O2 -Wall -Wno-unused-result -std=c++17 -g
 SRC = ./src
 HEADERS = ./src/config.h ./src/utils.h
 
-all: | ./bin ./build ./bin/miku ./bin/isolate ./bin/batchjudge ./bin/tddump
+all: | ./bin ./build ./bin/miku ./bin/isolate ./bin/tddump
 
-./bin/miku: ./build/main.o ./build/sandbox.o ./build/testsuite.o ./build/server_io.o ./build/utils.o
+./bin/miku: ./build/main.o ./build/sandbox.o ./build/testsuite.o ./build/server_io.o ./build/utils.o ./build/batchjudge.o
 	$(CC) -o $@ $^ $(CFLAGS)
 
 ./bin/tddump: ./build/tddump.o ./build/server_io.o ./build/utils.o
@@ -23,16 +23,13 @@ all: | ./bin ./build ./bin/miku ./bin/isolate ./bin/batchjudge ./bin/tddump
 ./build/sandbox.o: ./src/sandbox.cpp ./src/sandbox.h $(HEADERS)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
-./build/testsuite.o: ./src/testsuite.cpp ./src/testsuite.h ./src/sandbox.h $(HEADERS)
+./build/testsuite.o: ./src/testsuite.cpp ./src/testsuite.h ./src/sandbox.h ./src/batchjudge.h $(HEADERS)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 ./build/server_io.o: ./src/server_io.cpp ./src/server_io.h $(HEADERS)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
-./bin/batchjudge: ./build/batchjudge.o ./build/sandbox.o ./build/utils.o
-	$(CC) -o $@ $^ $(CFLAGS)
-
-./build/batchjudge.o: ./src/batchjudge.cpp ./src/sandbox.h $(HEADERS)
+./build/batchjudge.o: ./src/batchjudge.cpp ./src/batchjudge.h ./src/sandbox.h $(HEADERS)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 ./bin/isolate: ./isolate/*
@@ -46,4 +43,4 @@ all: | ./bin ./build ./bin/miku ./bin/isolate ./bin/batchjudge ./bin/tddump
 	mkdir -p ./build
 
 clean:
-	rm -f -r ./build/*
+	rm -f -r ./build/* ./bin/*
