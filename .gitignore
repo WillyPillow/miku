@@ -1,7 +1,9 @@
 *.swp
 test/
-testdata/
-testzone/
+testdata/*
+testzone/*
+!testdata/.keep
+!testzone/.keep
 bin/
 build/
 log/
