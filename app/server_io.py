@@ -6,6 +6,9 @@ from urllib.parse import urlencode
 from datetime import datetime
 import sys, inspect, os
 
+# retry times
+retry_times= 50
+
 # open stdin / stdout as binary
 stdin = open(sys.stdin.fileno(), 'rb', closefd = False)
 stdout = open(sys.stdout.fileno(), 'wb', buffering = 0, closefd = False)
@@ -56,15 +59,24 @@ def FetchTestdata(tid, problem_id, testdata_id):
 def FetchTestdataMeta(problem_id):
     return urlopen(URL('testdata_meta', pid = problem_id)).read()
 def RespondValidating(submission_id):
-    urlopen(URL('validating', sid = submission_id))
+    for _ in range(retry_times):
+        res = urlopen(URL('validating', sid = submission_id))
+        if res.getcode() == 200:
+            break
     return b''
 def UpdateMessage(submission_id, msg):
     msg_enc = urlencode({"message": msg}).encode('utf-8')
-    urlopen(URL('write_message', sid = submission_id), data = msg_enc)
+    for _ in range(retry_times):
+        urlopen(URL('write_message', sid = submission_id), data = msg_enc)
+        if res.getcode() == 200:
+            break
     return b''
 def UpdateVerdict(submission_id, verdict, status):
-    urlopen(URL('write_result', sid = submission_id, result = verdict, \
-            status = status))
+    for _ in range(retry_times):
+        urlopen(URL('write_result', sid = submission_id, result = verdict, \
+                status = status))
+        if res.getcode() == 200:
+            break
     return b''
 
 mapping = {
