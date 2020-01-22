@@ -67,14 +67,14 @@ def RespondValidating(submission_id):
 def UpdateMessage(submission_id, msg):
     msg_enc = urlencode({"message": msg}).encode('utf-8')
     for _ in range(retry_times):
-        urlopen(URL('write_message', sid = submission_id), data = msg_enc)
+        res = urlopen(URL('write_message', sid = submission_id), data = msg_enc)
         if res.getcode() == 200:
             break
     return b''
 def UpdateVerdict(submission_id, verdict, status):
     for _ in range(retry_times):
-        urlopen(URL('write_result', sid = submission_id, result = verdict, \
-                status = status))
+        res = urlopen(URL('write_result', sid = submission_id, result = verdict, \
+                          status = status))
         if res.getcode() == 200:
             break
     return b''
