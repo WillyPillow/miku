@@ -3,7 +3,7 @@ CFLAGS = -O2 -Wall -Wno-unused-result -std=c++17 -g
 SRC = ./src
 HEADERS = ./src/config.h ./src/utils.h
 
-all: | ./bin ./build ./bin/miku ./bin/isolate ./bin/tddump
+all: | ./bin ./build ./bin/miku /var/local/bin/isolate ./bin/tddump
 
 ./bin/miku: ./build/main.o ./build/sandbox.o ./build/testsuite.o ./build/server_io.o ./build/utils.o ./build/batchjudge.o
 	$(CC) -o $@ $^ $(CFLAGS)
@@ -32,9 +32,8 @@ all: | ./bin ./build ./bin/miku ./bin/isolate ./bin/tddump
 ./build/batchjudge.o: ./src/batchjudge.cpp ./src/batchjudge.h ./src/sandbox.h $(HEADERS)
 	$(CC) -o $@ -c $< $(CFLAGS)
 
-./bin/isolate: ./isolate/*
-	make -C ./isolate/
-	mv ./isolate/isolate ./bin/isolate
+/var/local/bin/isolate: ./isolate/*
+	make -C ./isolate/ install
 
 ./bin:
 	mkdir -p ./bin
@@ -44,3 +43,4 @@ all: | ./bin ./build ./bin/miku ./bin/isolate ./bin/tddump
 
 clean:
 	rm -f -r ./build/* ./bin/*
+	make -C ./isolate/ clean
