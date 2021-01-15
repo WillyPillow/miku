@@ -1,0 +1,64 @@
+From 80835ff3cf974cda14398e9fd291504b4aa30009 Mon Sep 17 00:00:00 2001
+From: oToToT <ty1208chiang@gmail.com>
+Date: Sat, 16 Jan 2021 00:31:18 +0800
+Subject: [PATCH 1/2] patch RLIMIT_FSIZE for TIOJ
+
+Signed-off-by: oToToT <ty1208chiang@gmail.com>
+---
+ isolate.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/isolate.c b/isolate.c
+index 68e3f9f..91b4055 100644
+--- a/isolate.c
++++ b/isolate.c
+@@ -70,6 +70,7 @@ int pass_environ;
+ int verbose;
+ static int silent;
+ static int fsize_limit;
++static int file_limit;
+ static int memory_limit;
+ static int stack_limit;
+ int block_quota;
+@@ -657,7 +658,10 @@ setup_rlimits(void)
+     RLIM(FSIZE, (rlim_t)fsize_limit * 1024);
+ 
+   RLIM(STACK, (stack_limit ? (rlim_t)stack_limit * 1024 : RLIM_INFINITY));
+-  RLIM(NOFILE, 64);
++  if(file_limit)
++    RLIM(NOFILE, file_limit);
++  else
++    RLIM(NOFILE, 64);
+   RLIM(MEMLOCK, 0);
+ 
+   if (max_processes)
+@@ -958,7 +962,7 @@ enum opt_code {
+   OPT_TTY_HACK,
+ };
+ 
+-static const char short_opts[] = "b:c:d:DeE:f:i:k:m:M:o:p::q:r:st:vw:x:";
++static const char short_opts[] = "b:c:d:DeE:f:i:k:m:M:o:p::q:r:st:vw:x:l:";
+ 
+ static const struct option long_opts[] = {
+   { "box-id",		1, NULL, 'b' },
+@@ -993,6 +997,7 @@ static const struct option long_opts[] = {
+   { "verbose",		0, NULL, 'v' },
+   { "version",		0, NULL, OPT_VERSION },
+   { "wall-time",	1, NULL, 'w' },
++  { "file-limit",	1, NULL, 'l' },
+   { NULL,		0, NULL, 0 }
+ };
+ 
+@@ -1097,6 +1102,9 @@ main(int argc, char **argv)
+       case 'x':
+ 	extra_timeout = 1000*atof(optarg);
+ 	break;
++      case 'l':
++	file_limit = atoi(optarg);
++	break;
+       case OPT_INIT:
+       case OPT_RUN:
+       case OPT_CLEANUP:
+-- 
+2.17.1
+
