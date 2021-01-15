@@ -53,7 +53,7 @@ int sandboxInit(int boxid) {
 
 int sandboxDele(int boxid) {
   Log("[debug] box-", boxid, "start clean");
-  //ExecuteRedir("", "/dev/null", "/dev/null", "isolate",
-      //"--box-id=" + PadInt(boxid), "--cg", "--cleanup");
+  ExecuteRedir("", "/dev/null", "/dev/null", "isolate",
+      "--box-id=" + PadInt(boxid), "--cg", "--cleanup");
   return 0;
 }
