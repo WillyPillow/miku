@@ -5,7 +5,8 @@ miku
 $ git clone https://github.com/adrien1018/miku.git
 $ cd miku
 $ git submodule update --init
-$ cd isolate && git am ../patches/*.patch```
+$ cd isolate && git am ../patches/*.patch
+```
 
 #### How to start the judge client
 ```bash
