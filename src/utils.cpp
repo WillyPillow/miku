@@ -1,6 +1,6 @@
 #include "utils.h"
 
-const std::string kBoxRoot = "/tmp/box";
+const std::string kBoxRoot = "/var/local/lib/isolate";
 const std::string kTestdataRoot = "./testdata";
 
 std::string PadInt(int x, size_t width) {
