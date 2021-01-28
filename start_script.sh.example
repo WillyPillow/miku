@@ -1,5 +1,7 @@
 #!/bin/bash
 
+isolate-check-environment --execute
+
 mkdir -p ./testdata
 mkdir -p ./testzone
 export PATH=$PATH:./app:./bin
