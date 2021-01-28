@@ -1,16 +1,18 @@
-#include<iostream>
-#include<cstdio>
-#include<cstdlib>
-#include<string>
-#include<sstream>
-#include<iomanip>
-#include"sandbox.h"
-#include"utils.h"
+#include "sandbox.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+
+#include "utils.h"
 
 using namespace std;
 
 int sandboxExec(int boxid, const sandboxOptions &opt, const std::vector<string>& comm) {
-  std::vector<std::string> args{"isolate", "--box-id=" + PadInt(boxid)};
+  std::vector<std::string> args{"schedtool", "-R", "-p", "99", "-e", "isolate", "--box-id=" + PadInt(boxid)};
   if (opt.cgroup) args.emplace_back("--cg");
   if (opt.preserve_env) {
     args.emplace_back("--full-env");
