@@ -42,7 +42,12 @@ inline int ReadReply(Reply& rep) {
   sz = sz << 8 | header[5];
   sz = sz << 8 | header[4];
   rep.message.resize(sz);
-  if (sz && read(infd, rep.message.data(), sz) != sz) return -1;
+  if (sz) {
+    uint32_t pos = 0;
+    while (pos < sz) {
+      pos += read(infd, rep.message.data() + pos, sz - pos);
+    }
+  }
   return 0;
 }
 
