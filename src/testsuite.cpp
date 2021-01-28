@@ -1,20 +1,23 @@
-#include <iostream>
+#include "testsuite.h"
+
+#include <cassert>
 #include <cstdio>
-#include <sstream>
 #include <fstream>
 #include <iomanip>
-#include <regex>
+#include <iostream>
 #include <map>
-#include <unistd.h>
+#include <regex>
+#include <sstream>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "utils.h"
-#include "sandbox.h"
-#include "config.h"
-#include "testsuite.h"
-#include "server_io.h"
+#include <unistd.h>
+
 #include "batchjudge.h"
+#include "config.h"
+#include "sandbox.h"
+#include "server_io.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -47,6 +50,8 @@ int testsuite(submission &sub) {
    int procnum = 0;
    int problem_id = sub.problem_id;
 
+   vector<int> box_to_test_id(MAXPARNUM, -1);  // Box ID -> Test data ID
+
    for (size_t i = 0; i < sub.tds.size(); ++i) {
       auto& nowtd = sub.tds[i];
       while(procnum >= MAXPARNUM){
@@ -58,12 +63,16 @@ int testsuite(submission &sub) {
             return ER;
          }
          int td = proc[cid];
-         eval(sub, td, BOXOFFSET + 10 + td, spBoxid);
+         size_t box_idx =
+           find(box_to_test_id.begin(), box_to_test_id.end(), td) - box_to_test_id.begin();
+         assert(box_idx < box_to_test_id.size());
+         eval(sub, td, BOXOFFSET + 10 + box_idx, spBoxid);
          if(AGGUPDATE){
             sendResult(sub, OK, false);
          }
          //cerr << "td" << td << " : " << sub.verdict[td] << endl;
-         sandboxDele(BOXOFFSET + 10 + td);
+         sandboxDele(BOXOFFSET + 10 + box_idx);
+         box_to_test_id[box_idx] = -1;
          --procnum;
       }
 
@@ -71,6 +80,10 @@ int testsuite(submission &sub) {
          //batch judge
          int memlim = nowtd.mem_limit;
          if (sub.lang == "haskell") memlim = memlim * 5 + 24 * 1024;
+         size_t box_idx =
+           find(box_to_test_id.begin(), box_to_test_id.end(), -1) - box_to_test_id.begin();
+         assert(box_idx < box_to_test_id.size());
+         box_to_test_id[box_idx] = i;
          pid_t pid = fork();
          if(pid == -1){
             perror("[ERROR] in testsuite, `fork()` failed :");
@@ -79,7 +92,7 @@ int testsuite(submission &sub) {
          }
          if(pid == 0){
             //child proc
-            int status = BatchJudge(problem_id, i, BOXOFFSET + 10 + i, nowtd.time_limit,
+            int status = BatchJudge(problem_id, i, BOXOFFSET + 10 + box_idx, nowtd.time_limit,
                 memlim, nowtd.output_limit, testBoxid, sub.lang);
             exit(status);
          }
@@ -96,13 +109,16 @@ int testsuite(submission &sub) {
          return ER;
       }
       const int td = proc[cid];
+      size_t box_idx =
+        find(box_to_test_id.begin(), box_to_test_id.end(), td) - box_to_test_id.begin();
+      assert(box_idx < box_to_test_id.size());
       //sub.verdict[td] = eval(problem_id, td);
-      eval(sub, td, BOXOFFSET + 10 + td, spBoxid);
+      eval(sub, td, BOXOFFSET + 10 + box_idx, spBoxid);
       if(AGGUPDATE){
          sendResult(sub, OK, false);
       }
       //cerr << "td" << td << " : " << sub.verdict[td] << endl;
-      sandboxDele(BOXOFFSET + 10 + td);
+      sandboxDele(BOXOFFSET + 10 + box_idx);
       --procnum;
    }
    //clear box-10
