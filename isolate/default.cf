@@ -22,3 +22,11 @@ num_boxes = 1000
 
 #box0.cpus = 4-7
 #box0.mems = 1
+box20.cpus = 1
+box21.cpus = 2
+box22.cpus = 3
+box23.cpus = 4
+box24.cpus = 5
+box25.cpus = 6
+box26.cpus = 7
+box27.cpus = 8
