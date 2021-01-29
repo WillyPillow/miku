@@ -51,9 +51,9 @@ int BatchJudge(int pid, int td, int boxid, int tl, int ml, int ol, int testee,
 
   //invoke box command
   if (lang == "python2") {
-    sandboxExec(boxid, opt, {"/usr/bin/env", "python2.7", "main.pyc"});
+    sandboxExec(boxid, opt, {"/usr/bin/env", "python2", "main.pyc"});
   } else if (lang == "python3") {
-    sandboxExec(boxid, opt, {"/usr/bin/env", "python3.7", "main.pyc"});
+    sandboxExec(boxid, opt, {"/usr/bin/env", "python3", "main.pyc"});
   } else {
     sandboxExec(boxid, opt, {"main.out"});
   }

@@ -284,9 +284,9 @@ int compile(const submission& target, int boxid, int spBoxid)
   }else if(target.lang == "haskell"){
     args = {"/usr/bin/env", "ghc", "./main.hs", "-o", "./main.out", "-O", "-tmpdir", ".", "-w"};
   }else if(target.lang == "python2"){
-    args = {"/usr/bin/env", "python2.7", "-m", "py_compile", "main.py"};
+    args = {"/usr/bin/env", "python2", "-m", "py_compile", "main.py"};
   }else if(target.lang == "python3"){
-    args = {"/usr/bin/env", "python3.7", "-c", "import py_compile;py_compile.compile(\'main.py\',\'main.pyc\')"};
+    args = {"/usr/bin/env", "python3", "-c", "import py_compile;py_compile.compile(\'main.py\',\'main.pyc\')"};
   }
   if(!target.std.empty() && target.std != "c90"){
     args.push_back("-std=" + target.std);
